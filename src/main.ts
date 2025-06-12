@@ -2,10 +2,30 @@
 
 // const getActress = () => {};
 
-const getActress = <T>(id: number): T | null => {
-  console.log('id into function: ', id);
-  return null;
+// is Actress
+const isActress = (actress: unknown): actress is Actress => {
+  if (typeof actress === 'object' && actress !== null && 'id' in actress && 'name' in actress && 'birth_year' in actress && 'biography' in actress && 'image' in actress && 'most_famous_movies' in actress && 'awards' in actress && 'nationality' in actress) {
+    return true;
+  }
+
+  return false;
 };
+
+const getActress = async <T>(id: number): Promise<T | null> => {
+  const res = await fetch(`http://localhost:3333/actresses/${id}`);
+  if (!res.ok) {
+    throw new Error('Errore nel ricevere i dati dalla fetch');
+  }
+
+  const resJson: unknown = await res.json();
+  if (!isActress(resJson)) {
+    throw new Error('Dati ricevuti non rispettano il formato corretto');
+  }
+
+  return resJson as T;
+};
+
+// --------------------------------------------------------------------------------
 
 type Person = {
   readonly id: number;
@@ -22,5 +42,9 @@ type Actress = Person & {
   nationality: 'American' | 'British' | 'Australian' | 'Israeli-American' | 'South African' | 'French' | 'Indian' | 'Israeli' | 'Spanish' | 'South Korean' | 'Chinese';
 };
 
-const foundActress: Actress | null = getActress(1);
-console.log(foundActress);
+// --------------------------------------------------------------------------------
+
+(async () => {
+  const foundActress: Actress | null = await getActress(1);
+  console.log('foundActress: ', foundActress);
+})();
