@@ -11,6 +11,8 @@ const isActress = (actress: unknown): actress is Actress => {
   return false;
 };
 
+// --------------------------------------------------------------------------------
+
 const getActress = async <T>(id: number): Promise<T | null> => {
   const res = await fetch(`http://localhost:3333/actresses/${id}`);
   if (!res.ok) {
@@ -23,6 +25,30 @@ const getActress = async <T>(id: number): Promise<T | null> => {
   }
 
   return resJson as T;
+};
+
+const getAllActresses = async <T>(): Promise<T[] | null> => {
+  const res = await fetch(`http://localhost:3333/actresses/`);
+
+  if (!res.ok) {
+    throw new Error('Errore nel ricevere i dati dalla fetch');
+  }
+
+  const resJson: unknown = await res.json();
+
+  if (Array.isArray(resJson)) {
+    resJson.forEach((actress) => {
+      if (!isActress(actress)) {
+        throw new Error('Dati ricevuti non rispettano il formato corretto');
+      }
+    });
+  }
+
+  // resJson.forEach(actress => {
+
+  // });
+
+  return resJson as T[];
 };
 
 // --------------------------------------------------------------------------------
@@ -47,4 +73,7 @@ type Actress = Person & {
 (async () => {
   const foundActress: Actress | null = await getActress(1);
   console.log('foundActress: ', foundActress);
+
+  const allActresses: Actress[] | null = await getAllActresses();
+  console.log('all actresses: ', allActresses);
 })();
