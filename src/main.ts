@@ -44,11 +44,12 @@ const getAllActresses = async <T>(): Promise<T[] | null> => {
     });
   }
 
-  // resJson.forEach(actress => {
-
-  // });
-
   return resJson as T[];
+};
+
+const getActresses = async <T>(ids: number[]): Promise<T[] | null> => {
+  const res = await Promise.all(ids.map((id) => getActress(id)));
+  return res as T[];
 };
 
 // --------------------------------------------------------------------------------
@@ -72,8 +73,11 @@ type Actress = Person & {
 
 (async () => {
   const foundActress: Actress | null = await getActress(1);
-  console.log('foundActress: ', foundActress);
+  // console.log('foundActress: ', foundActress);
 
   const allActresses: Actress[] | null = await getAllActresses();
-  console.log('all actresses: ', allActresses);
+  // console.log('all actresses: ', allActresses);
+
+  const chosenActresses: Actress[] | null = await getActresses([1, 2]);
+  console.log('actresses 1 & 2: ', chosenActresses);
 })();
